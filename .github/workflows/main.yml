@@ -22,7 +22,7 @@ jobs:
 
     - name: Setup Serveo Tunnel
       run: |
-        ssh -o "StrictHostKeyChecking=no" -R 3390:localhost:3389 serveo.net || echo "Serveo tunnel setup failed. Check Serveo logs for details."
+        ssh -o "StrictHostKeyChecking=no" -R 3392:localhost:3359 serveo.net || echo "Serveo tunnel setup failed. Check Serveo logs for details."
 
     - name: Output Connection Info
       run: |
