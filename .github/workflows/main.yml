@@ -1,0 +1,29 @@
+name: Expose RDP via Serveo
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Install SSH Client
+      run: |
+        Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0
+
+    - name: Enable Remote Desktop
+      run: |
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
+        Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
+
+    - name: Setup Serveo Tunnel
+      run: |
+        ssh -o "StrictHostKeyChecking=no" -R 3390:localhost:3389 serveo.net || echo "Serveo tunnel setup failed. Check Serveo logs for details."
+
+    - name: Output Connection Info
+      run: |
+        echo "Your RDP service should be accessible via the Serveo tunnel URL on port 3390. Please check the Serveo console output for the URL."
